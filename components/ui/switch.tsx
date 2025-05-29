@@ -25,14 +25,17 @@ const AnimatedThemeSwitch = React.forwardRef<
   }
 
   const buttonRef = useRef<HTMLButtonElement>(null);
+  
   // Merge the forwarded ref with the internal buttonRef
-  const ref = React.useCallback(
-    (node: HTMLButtonElement) => {
-      // @ts-ignore
-      if (forwardedRef) forwardedRef.current = node;
-      buttonRef.current = node;
-    }, [forwardedRef]
-  );
+  React.useEffect(() => {
+    if (forwardedRef) {
+      if (typeof forwardedRef === 'function') {
+        forwardedRef(buttonRef.current);
+      } else {
+        forwardedRef.current = buttonRef.current;
+      }
+    }
+  }, [forwardedRef]);
 
   const [dimensions, setDimensions] = React.useState({ width: 0, height: 0 });
 
@@ -52,7 +55,7 @@ const AnimatedThemeSwitch = React.forwardRef<
 
   return (
     <button
-      ref={ref}
+      ref={buttonRef}
       type="button"
       role="switch"
       aria-checked={checked}
